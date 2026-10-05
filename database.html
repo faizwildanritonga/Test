@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Database</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="bungkus lebar">
+  <div class="kepala-app">
+    <div class="judul-app">Portal Kelas - Database</div>
+    <a href="index.html" class="tombol sekunder kecil" style="text-decoration:none;">Kembali</a>
+  </div>
+
+  <div class="ledger">
+    <p>Isi file <span class="mono">DB/database.json</span> - cuma username dan hash, tidak ada password.</p>
+    <button class="tombol sekunder" id="btn-refresh" style="width:auto;">Refresh</button>
+    <button class="tombol sekunder" id="btn-export" style="width:auto;">Export ke database.json</button>
+  </div>
+
+  <div id="tabel-area"></div>
+</div>
+
+<script type="module" src="app-database.js"></script>
+</body>
+</html>

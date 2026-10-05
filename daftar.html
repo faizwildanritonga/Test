@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daftar</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="bungkus">
+  <div class="kepala-app">
+    <div class="judul-app">Portal Kelas</div>
+  </div>
+
+  <div class="ledger">
+    <h2>Buat Akun</h2>
+    <form id="form-daftar">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="new-password" required />
+      </div>
+      <button type="submit" class="tombol" id="btn-daftar">Daftar</button>
+    </form>
+  </div>
+
+  <div id="hasil-area"></div>
+
+  <p style="text-align:center; font-size:14px; color:#5b6472;">
+    Sudah punya akun? <a href="login.html">Masuk di sini</a>
+  </p>
+</div>
+
+<script src="hash.js"></script>
+<script type="module" src="app-daftar.js"></script>
+</body>
+</html>
