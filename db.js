@@ -1,86 +1,47 @@
-// db.js - lapisan penyimpanan user.
-// Sumber data "resmi" adalah file DB/database.json (di-commit ke repo).
-// Saat halaman dibuka, data itu dimuat (seed) ke localStorage sebagai
-// working storage selama sesi berjalan. Tombol Export di database.html
-// dipakai untuk mengunduh ulang DB/database.json yang sudah diperbarui,
-// supaya bisa ditimpa manual ke folder DB/ lalu di-commit ke GitHub.
+// db.js
+const SUPABASE_URL = 'https://jfttoslzeptwyvfqtsxy.supabase.co'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdHRvc2x6ZXB0d3l2ZnF0c3h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyMTk5OTEsImV4cCI6MjEwNjc5NTk5MX0.NZGy7YyHCLLIAf0Nygyxuh8eaBl-SFrwzKc6mAbmJSw';
 
-const KUNCI_PENYIMPANAN = "combisalt_db";
-const PATH_SEED = "DB/database.json";
+// Inisialisasi Supabase Client
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function bacaSemua() {
-  const raw = localStorage.getItem(KUNCI_PENYIMPANAN);
-  return raw ? JSON.parse(raw) : [];
-}
+// 1. DAFTAR: Simpan user baru ke tabel 'username'
+async function daftarUser(username, hashHex) {
+    const { data, error } = await db
+        .from('username') // Nama tabel di Supabase
+        .insert([{ username: username, hashHex: hashHex }]); // Nama kolom di Supabase
 
-function simpanSemua(data) {
-  localStorage.setItem(KUNCI_PENYIMPANAN, JSON.stringify(data));
-}
-
-/** Panggil sekali di awal tiap halaman: gabungkan seed DB/database.json
- * (kalau ada & belum pernah dimuat) ke localStorage. Aman dipanggil
- * berkali-kali (tidak menduplikasi). */
-export async function muatSeed() {
-  try {
-    const res = await fetch(PATH_SEED, { cache: "no-store" });
-    if (!res.ok) return;
-    const seed = await res.json();
-    if (!Array.isArray(seed)) return;
-    const data = bacaSemua();
-    let berubah = false;
-    for (const u of seed) {
-      if (u && u.username && !data.some((x) => x.username === u.username)) {
-        data.push(u);
-        berubah = true;
-      }
+    if (error) {
+        if (error.code === '23505') { // Error jika username sudah ada (Unique Violation)
+            throw new Error("Username sudah dipakai orang lain!");
+        }
+        console.error("Error DB:", error);
+        throw new Error("Gagal koneksi ke database.");
     }
-    if (berubah) simpanSemua(data);
-  } catch {
-    // Kalau dibuka langsung dari file:// (bukan lewat server), fetch bisa
-    // gagal - tidak masalah, aplikasi tetap jalan pakai localStorage saja.
-  }
+    return true;
 }
 
-/** Daftarkan user baru. Melempar Error kalau username sudah dipakai. */
-export async function daftarkanUser(username, hashHex) {
-  const data = bacaSemua();
-  if (data.some((u) => u.username === username)) {
-    throw new Error("Username sudah dipakai. Coba username lain.");
-  }
-  data.push({
-    username,
-    hashHex,
-    waktuDaftar: new Date().toISOString(),
-  });
-  simpanSemua(data);
+// 2. LOGIN: Cari user berdasarkan username
+async function ambilUser(username) {
+    const { data, error } = await db
+        .from('username')
+        .select('username, hashHex')
+        .eq('username', username)
+        .single(); // Ambil hanya 1 data
+
+    if (error || !data) return null; // Jika tidak ditemukan
+    return data;
 }
 
-/** Ambil data satu user. null kalau tidak ada. */
-export async function ambilUser(username) {
-  const data = bacaSemua();
-  return data.find((u) => u.username === username) || null;
-}
+// 3. DATABASE: Ambil semua data untuk ditampilkan di halaman database.html
+async function ambilSemuaData() {
+    const { data, error } = await db
+        .from('username')
+        .select('username, hashHex');
 
-/** Ambil seluruh user tersimpan (untuk halaman database). */
-export async function ambilSemuaUser() {
-  return bacaSemua();
-}
-
-/** Unduh seluruh data sebagai file database.json. */
-export function exportKeFile() {
-  const data = bacaSemua();
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "database.json";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-
-/** Hapus seluruh data di browser ini. */
-export function hapusSemua() {
-  localStorage.removeItem(KUNCI_PENYIMPANAN);
+    if (error) {
+        console.error("Error ambil data:", error);
+        return [];
+    }
+    return data || [];
 }
