@@ -8,7 +8,7 @@
 
 const SUPABASE_URL = "https://jfttoslzeptwyvfqtsxy.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdHRvc2x6ZXB0d3l2ZnF0c3h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyMTk5OTEsImV4cCI6MjEwNjc5NTk5MX0.NZGy7YyHCLLIAf0Nygyxuh8eaBl-SFrwzKc6mAbmJSw";
-const TABEL = "users";
+const TABEL = "username";
 
 const ENDPOINT = `${SUPABASE_URL}/rest/v1/${TABEL}`;
 const HEADER_DASAR = {
